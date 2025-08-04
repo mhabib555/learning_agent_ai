@@ -17,8 +17,8 @@ set_default_openai_client(client)
 async def global_level():
     
     agent: Agent = Agent(
-        name="Best Friend",
-        instructions="You are best friend",
+        name="Assistant",
+        instructions="You are a helpful assistant",
         model="gemini-2.5-flash"
     )
 

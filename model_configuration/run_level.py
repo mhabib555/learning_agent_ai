@@ -27,8 +27,8 @@ async def run_level():
    )
 
    agent: Agent = Agent(
-      name= "Best Friend",
-      instructions = "You are Best Social Expert",
+      name= "Assistant",
+      instructions = "You are a helpful assistant",
    )
 
    response = await Runner.run(

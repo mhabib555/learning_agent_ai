@@ -23,16 +23,15 @@ async def chat():
 
 
     agent: Agent = Agent(
-        name="Best Friend",
-        instructions="You are best social expert",
+        name="Assistant",
+        instructions="You are a helpful assistant",
         model= model
     )
 
-    topic= "self improvement, communication, empathy"
 
     result = await Runner.run(
         agent, 
-        f"Give me one short advice {topic}, possibly one line"
+        "Give me one short advice"
     )
 
     print(result.final_output)

@@ -15,8 +15,8 @@ client: AsyncOpenAI = AsyncOpenAI(
 async def agent_level():
 
     agent: Agent = Agent(
-       name="Best Friend",
-       instructions="You are Best Social Expert",
+       name="Assistant",
+       instructions="You are a helpful assistant",
        model=OpenAIChatCompletionsModel(
         model= "gemini-2.5-flash",
         openai_client=client
