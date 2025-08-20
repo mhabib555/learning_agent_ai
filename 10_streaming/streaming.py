@@ -1,18 +1,13 @@
 import os, asyncio
 from dotenv import load_dotenv
-from agents import Agent, AsyncOpenAI, OpenAIChatCompletionsModel, Runner, RunContextWrapper, function_tool, set_tracing_disabled
+from agents import Agent, AsyncOpenAI, OpenAIChatCompletionsModel, Runner, ItemHelpers, function_tool, set_tracing_disabled
 from dataclasses import dataclass
+import random
 
 set_tracing_disabled(disabled=True)
 load_dotenv()
 api_key=os.getenv("GEMINI_API_KEY")
 base_url=os.getenv("GEMINI_BASE_URL")
-
-@dataclass
-class UserContext: 
-    username: str
-    email: str | None = None
-
 
 gemini_client: AsyncOpenAI = AsyncOpenAI(
     api_key=api_key,
@@ -24,36 +19,43 @@ model: OpenAIChatCompletionsModel = OpenAIChatCompletionsModel(
     openai_client=gemini_client
 )
 
-
-
 @function_tool
-def search(local_context: RunContextWrapper[UserContext], query: str) -> str:
-    print(f"\nSearching ..... {query}")
-    print("\ncontext", local_context.context, "\n\n")
-    return "No result"
-
-async def special_prompt(special_context: RunContextWrapper[UserContext], agent: Agent[UserContext]) -> str: 
-    return f"You are a math expert. User: {special_context.context.username}, Agent: {agent.name}. Please assist with math-related queries."
-
+def number_of_jokes() -> int:
+    return random.randint(1,10)
 
 agent: Agent = Agent(
     name="Assistant",
-    instructions=special_prompt,
+    instructions="First call `number_of_jokes` took then tell that many jokes",
     model=model,
-    tools=[search]
+    tools=[number_of_jokes]
 )
 
 async def call_agent():
 
-    user_context = UserContext(username="Habib")
-
-    response = await Runner.run(
+    result = Runner.run_streamed(
         starting_agent=agent,
-        input="Search for the early childhood math education books",
-        context=user_context
+        input="Hi",
     )
 
-    print(response.final_output)
+    print("=== Run starting ===")
+    async for event in result.stream_events():
+        # We'll ignore the raw responses event deltas
+        if event.type == "raw_response_event":
+            continue
+        elif event.type == "agent_updated_stream_event":
+            print(f"Agent updated: {event.new_agent.name}")
+            continue
+        elif event.type == "run_item_stream_event":
+            if event.item.type == "tool_call_item":
+                print("-- Tool was called")
+            elif event.item.type == "tool_call_output_item":
+                print(f"-- Tool output: {event.item.output}")
+            elif event.item.type == "message_output_item":
+                print(f"-- Message output:\n {ItemHelpers.text_message_output(event.item)}")
+            else:
+                pass  # Ignore other event types
+
+
 
 
 asyncio.run(call_agent())
