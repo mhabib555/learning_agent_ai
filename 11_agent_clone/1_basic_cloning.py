@@ -1,7 +1,6 @@
 import os, asyncio
 from dotenv import load_dotenv
-from agents import Agent, AsyncOpenAI, OpenAIChatCompletionsModel, Runner, ItemHelpers, function_tool, set_tracing_disabled
-import random
+from agents import Agent, AsyncOpenAI, OpenAIChatCompletionsModel, Runner, set_tracing_disabled
 
 set_tracing_disabled(disabled=True)
 load_dotenv()
