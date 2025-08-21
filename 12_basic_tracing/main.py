@@ -17,32 +17,22 @@ model: OpenAIChatCompletionsModel = OpenAIChatCompletionsModel(
     openai_client=gemini_client
 )
 
-base_agent: Agent = Agent(
+agent: Agent = Agent(
     name="Assistant",
     instructions="You are helpful assistant",
     model=model,
 )
 
-creative_agent: Agent = base_agent.clone(
-    name="Creative",
-    instructions="You are creative"
-)
 async def call_agent():
 
     input = "give me one business idea, concise"
 
     result_base = await Runner.run(
-        starting_agent=base_agent,
+        starting_agent=agent,
         input=input,
     )
 
-    result_creative = await Runner.run(
-        starting_agent=creative_agent,
-        input=input,
-    )
-
-    print("\n\nBase: ", result_base.final_output)
-    print("\n\nCreative: ", result_creative.final_output)
+    print("\nAgent: ", result_base.final_output)
 
 
 
